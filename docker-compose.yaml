@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  ca_compose:
+    build:
+      context: . 
+      dockerfile: dokcoeur
+
+    expose:
+      - '8080'
+
+    deploy: 
+      replicas: 4
+
+    restart: always
+
+    environment:
+      - PING_LISTEN_PORT=8080
+
+    networks:
+      - front-network
+
+  nginx_reverse_proxy:
+    image: nginx:latest
+
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+    ports:
+      - 8081:80  
+
+    depends_on:
+      - ca_compose
+
+    networks:
+      - front-network
+
+networks:
+  front-network:
+    driver: bridge
